@@ -4,7 +4,11 @@
 
 **a. Initial design**
 
-- Briefly describe your initial UML design.
+- Briefly describe your initial UML design:
+The 3 core actions a user should be able to perform are:
+    - Seeing the daily schedule
+    - Adding one or multiple pets
+    - Being able to schedule a task
 - What classes did you include, and what responsibilities did you assign to each?
 
 **b. Design changes**
