@@ -2,6 +2,17 @@
 
 You are building **PawPal+**, a Streamlit app that helps a pet owner plan care tasks for their pet.
 
+## Features
+
+- **Sorting by time slot** — Tasks are automatically ordered morning → afternoon → evening using `sort_by_time()`. Tasks with no preferred time default to midday so they never disrupt anchored slots.
+- **Priority tie-breaking** — Within the same time slot, high-priority tasks are scheduled before medium and low, ensuring the most important care never gets pushed out.
+- **Daily & weekly recurrence** — Marking a recurring task complete via `complete_task()` auto-generates the next occurrence with the correct due date (`+1 day` or `+7 days`). One-off tasks are unaffected.
+- **Conflict detection** — `detect_conflicts()` scans the built schedule for overlapping time windows and returns plain-English warnings, surfaced in the UI with the affected task names and a suggested fix.
+- **Task filtering** — `filter_tasks()` accepts an optional completion status and/or pet name so you can instantly answer "what does Mochi still need today?" without manual looping.
+- **Overflow protection** — Tasks that would run past the owner's `available_end` hour are caught during schedule generation and surfaced as skipped tasks rather than silently dropped.
+
+---
+
 ## Scenario
 
 A busy pet owner needs help staying consistent with pet care. They want an assistant that can:
@@ -64,23 +75,6 @@ python -m pytest tests/ -v
 The core scheduling logic — sorting, recurrence, and conflict detection — is well-covered by the test suite and the implementations are straightforward. One star is held back because `build_schedule()`, `priority_value()`, and `get_species_defaults()` are still stubs, so end-to-end schedule generation and priority tie-breaking are not yet tested. Confidence will reach 5 / 5 once those methods are implemented and covered.
 
 ---
+📸 Demo:
 
-## Getting started
-
-### Setup
-
-```bash
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-```
-
-### Suggested workflow
-
-1. Read the scenario carefully and identify requirements and edge cases.
-2. Draft a UML diagram (classes, attributes, methods, relationships).
-3. Convert UML into Python class stubs (no logic yet).
-4. Implement scheduling logic in small increments.
-5. Add tests to verify key behaviors.
-6. Connect your logic to the Streamlit UI in `app.py`.
-7. Refine UML so it matches what you actually built.
+<a href="C:\Users\prana\Codepath\AI class\ai110-module2show-pawpal-starter\demo_img.png" target="_blank"><img src='C:\Users\prana\Codepath\AI class\ai110-module2show-pawpal-starter\demo_img.png' title='PawPal App' width='' alt='PawPal App' class='center-block' /></a>

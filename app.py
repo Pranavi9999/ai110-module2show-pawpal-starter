@@ -54,19 +54,27 @@ if st.button("Add task"):
         )
         pet.add_task(task)
         st.session_state.tasks.append(task)
-        st.success(f"Added task: {task_title}")
+        st.success(f"Added: {task_title}")
 
+# --- Task list sorted via Scheduler.sort_by_time() ---
 if st.session_state.tasks:
-    st.write("Current tasks:")
+    if "owner" in st.session_state:
+        _preview_scheduler = Scheduler(st.session_state.owner)
+        _preview_scheduler.tasks = list(st.session_state.tasks)
+        sorted_preview = _preview_scheduler.sort_by_time()
+    else:
+        sorted_preview = st.session_state.tasks
+
+    st.caption("Tasks sorted by time slot (morning → afternoon → evening)")
     st.table([
         {
+            "Time slot": t.preferred_time or "—",
             "Title": t.title,
             "Duration (min)": t.duration_minutes,
             "Priority": t.priority,
-            "Time": t.preferred_time,
-            "Pet": t.pet_name,
+            "Pet": t.pet_name or "—",
         }
-        for t in st.session_state.tasks
+        for t in sorted_preview
     ])
 else:
     st.info("No tasks yet. Add one above.")
@@ -88,8 +96,9 @@ if st.button("Generate schedule"):
         for task in st.session_state.tasks:
             scheduler.tasks.append(task)
 
+        # Use Scheduler.sort_by_time() then break ties by priority
         sorted_tasks = sorted(
-            scheduler.tasks,
+            scheduler.sort_by_time(),
             key=lambda t: (
                 TIME_ORDER.get(t.preferred_time, 12),
                 -PRIORITY_MAP.get(t.priority, 1),
@@ -98,6 +107,7 @@ if st.button("Generate schedule"):
 
         current_hour = owner.available_start
         schedule = []
+        skipped = []
         for task in sorted_tasks:
             slot_start = TIME_ORDER.get(task.preferred_time, current_hour)
             start = max(current_hour, slot_start)
@@ -105,20 +115,52 @@ if st.button("Generate schedule"):
             if end <= owner.available_end:
                 schedule.append((task, start))
                 current_hour = end
+            else:
+                skipped.append(task)
 
         scheduler._schedule = schedule
 
+        # --- Conflict warnings via Scheduler.detect_conflicts() ---
+        conflicts = scheduler.detect_conflicts()
+        if conflicts:
+            st.error("Schedule conflicts detected — please review before your day starts:")
+            for warning in conflicts:
+                # Parse out just the two task names for a pet-owner-friendly message
+                # e.g. "WARNING: 'Walk' (...) overlaps with 'Feed' (...)"
+                friendly = (
+                    warning
+                    .replace("WARNING: ", "")
+                    .split("overlaps with")
+                )
+                if len(friendly) == 2:
+                    task_a = friendly[0].split("(")[0].strip().strip("'")
+                    task_b = friendly[1].split("(")[0].strip().strip("'")
+                    st.warning(
+                        f"**{task_a}** and **{task_b}** overlap. "
+                        "Consider moving one to a different time slot or shortening its duration."
+                    )
+                else:
+                    st.warning(warning)
+
+        # --- Schedule table ---
         if schedule:
-            st.success(f"Today's Schedule for {owner.name}")
+            st.success(f"Today's plan for {owner.name}")
+            PRIORITY_ICON = {"high": "🔴", "medium": "🟡", "low": "🟢"}
             st.table([
                 {
-                    "Time": f"{int(s):02d}:{int((s % 1) * 60):02d}",
+                    "Start time": f"{int(s):02d}:{int((s % 1) * 60):02d}",
                     "Task": t.title,
-                    "Pet": t.pet_name,
+                    "Pet": t.pet_name or "—",
                     "Duration (min)": t.duration_minutes,
-                    "Priority": t.priority,
+                    "Priority": f"{PRIORITY_ICON.get(t.priority, '')} {t.priority}",
                 }
                 for t, s in schedule
             ])
         else:
             st.warning("No tasks fit within the available hours.")
+
+        # --- Skipped tasks ---
+        if skipped:
+            st.error(f"{len(skipped)} task(s) couldn't fit in today's schedule:")
+            for t in skipped:
+                st.warning(f"**{t.title}** ({t.duration_minutes} min) — runs past {owner.available_end}:00")

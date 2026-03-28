@@ -61,12 +61,22 @@ Why it's reasonable: A solo pet owner can only actively do one thing at a time. 
 **a. How you used AI**
 
 - How did you use AI tools during this project (for example: design brainstorming, debugging, refactoring)?
+
+I used AI to help with the mermaid code, the logic, and test cases. 
+
 - What kinds of prompts or questions were most helpful?
+
+The more information I gave provided the best outputs. It's important to make sure you give the most amount of relevant information to receive an output tailored to the question.
 
 **b. Judgment and verification**
 
 - Describe one moment where you did not accept an AI suggestion as-is.
+
+Sometimes when I would ask a question to help me with brainstorming it would automatically provide the code when I just wanted ideas. I would have to decline the code and emphasize that I didn't want code.
+
 - How did you evaluate or verify what the AI suggested?
+
+I would run the code to see that the output is as expected.
 
 ---
 
@@ -77,10 +87,18 @@ Why it's reasonable: A solo pet owner can only actively do one thing at a time. 
 - What behaviors did you test?
 - Why were these tests important?
 
+Some behaviors that I tested were a task with missing/unknown time. This is important to test to make sure it doesn't crash. Test what happens when 2 tasks are in the same time slot. Test what happens when there's an empty task list and make sure it does not raise an error. 
+
 **b. Confidence**
 
 - How confident are you that your scheduler works correctly?
+About 4/5 for the parts that are built — sorting, recurrence, filtering, and conflict detection all have passing tests. Confidence drops for the full pipeline since build_schedule() and priority_value() are still stubs and untested end-to-end.
+
 - What edge cases would you test next if you had more time?
+- Tasks that overflow past available_end
+- Priority tie-breaking within the same time slot
+- filter_tasks() with both filters active at once (AND logic)
+- Zero-duration tasks in conflict detection
 
 ---
 
@@ -90,10 +108,16 @@ Why it's reasonable: A solo pet owner can only actively do one thing at a time. 
 
 - What part of this project are you most satisfied with?
 
+I am satisfied that the project runs successfully and does what is intended. It handles the edge cases successfully and does not crash.
+
 **b. What you would improve**
 
 - If you had another iteration, what would you improve or redesign?
 
+I would work on making the UI better. Currently it looks very simple, and making more enhancements would make it more user friendly.
+
 **c. Key takeaway**
 
 - What is one important thing you learned about designing systems or working with AI on this project?
+
+We can't accept every output that AI gives. We have to make sure that the output it gives is a plausible fix. Also, make sure to push to github often in case AI accidentally writes over existing code that you need. 
