@@ -9,12 +9,21 @@ The 3 core actions a user should be able to perform are:
     - Seeing the daily schedule
     - Adding one or multiple pets
     - Being able to schedule a task
+
 - What classes did you include, and what responsibilities did you assign to each?
+
+I am planning on adding a pet, owner, task, and scheduler class.
+
+- The pet class will have the following responsibilities: name, species, age
+- The owner class will have the following responsibilities: name, available_start, available_end, pets, add_pet
+- The task class will have the following responsibilities: title, duration_time, priority, is_recurring
+- The scheduler class will have the following responsibilities: owner, tasks, add_task, build_schedule()
 
 **b. Design changes**
 
-- Did your design change during implementation?
-- If yes, describe at least one change and why you made it.
+- Did your design change during implementation? Yes, AI helped me notice that there was no time slot tracking, the explain_schedule method had no shared state with build_schedule, and Task was not linked to Pet.
+
+- If yes, describe at least one change and why you made it. Originally build_schedule() and explain_schedule() were fully independent. I added self._schedule: list[tuple[Task, int]] so build_schedule() stores each task with its assigned start hour, and explain_schedule() reads from it. Without shared state, explain_schedule() had no way to know when or why tasks were placed.
 
 ---
 
