@@ -34,10 +34,25 @@ I am planning on adding a pet, owner, task, and scheduler class.
 - What constraints does your scheduler consider (for example: time, priority, preferences)?
 - How did you decide which constraints mattered most?
 
+Owner availability window: tasks only get placed between available_start and available_end (e.g., 8am–8pm). Any task that would push past available_end is dropped entirely.
+
+Preferred time slot: each task declares morning, afternoon, or evening. The scheduler maps these to anchor hours (8, 13, 17) and won't start a task earlier than its slot's anchor.
+
+Priority: within the same time slot, high priority tasks are sorted before medium and low, so they get placed first and are least likely to be crowded out.
+
+Task duration: the running clock advances by duration_minutes / 60 after each task, preventing tasks from stacking on top of each other.
+
+How I decided which mattered most:
+
+Time availability comes first because it's a hard limit. No amount of priority overrides the fact that the owner simply isn't available. Preferred time slot comes second because pet care tasks are often biologically driven (a morning walk, a bedtime feeding), so respecting the slot keeps the schedule realistic. Priority acts as a tiebreaker within a slot rather than a global override, because bumping a low-priority task from morning to evening is less disruptive than ignoring time preferences entirely.
 **b. Tradeoffs**
 
 - Describe one tradeoff your scheduler makes.
 - Why is that tradeoff reasonable for this scenario?
+
+The scheduler uses a single running clock that advances tasks one after another, so it cannot place two tasks in parallel, even if one is for Buddy and one is for Mochi.
+
+Why it's reasonable: A solo pet owner can only actively do one thing at a time. They can't walk Buddy while simultaneously cleaning Mochi's litter box. Modeling the schedule as a linear queue reflects how a real owner experiences their day. Allowing parallel tracks would suggest the owner can be in two places at once, which isn't practical for daily planning. The tradeoff favors simplicity and real-world accuracy over scheduling efficiency.
 
 ---
 

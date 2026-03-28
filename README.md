@@ -22,6 +22,18 @@ Your final app should:
 - Display the plan clearly (and ideally explain the reasoning)
 - Include tests for the most important scheduling behaviors
 
+## Smarter Scheduling
+
+Beyond basic task ordering, PawPal+ includes four algorithmic improvements to make the daily plan more reliable:
+
+- **Time-slot sorting** — `sort_by_time()` orders tasks chronologically across morning, afternoon, and evening slots. Tasks with no preferred time default to midday so they never disrupt the morning or evening anchors.
+
+- **Flexible filtering** — `filter_tasks()` accepts an optional completion status and/or pet name, making it easy to answer questions like "what does Buddy still have left today?" without looping manually.
+
+- **Recurring task scheduling** — marking a `"daily"` or `"weekly"` task complete via `complete_task()` automatically creates the next occurrence with the correct due date calculated using Python's `timedelta`. One-off tasks are unaffected.
+
+- **Conflict detection** — `detect_conflicts()` scans the built schedule for overlapping time windows using the interval overlap condition (`A.start < B.end and B.start < A.end`) and returns plain-English warning messages without crashing the program.
+
 ## Getting started
 
 ### Setup
